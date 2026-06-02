@@ -1,1 +1,342 @@
-# iot_1
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Automatic Multi PCD Drill Jig</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+min-height:100vh;
+padding:20px;
+
+background:
+linear-gradient(
+135deg,
+#0f172a,
+#1e3a8a,
+#0f766e);
+
+color:white;
+}
+
+.header{
+text-align:center;
+padding:20px;
+
+background:rgba(255,255,255,0.08);
+
+backdrop-filter:blur(10px);
+
+border-radius:15px;
+
+margin-bottom:20px;
+}
+
+.container{
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(280px,1fr));
+
+gap:20px;
+}
+
+.card{
+
+background:
+rgba(255,255,255,0.08);
+
+backdrop-filter:blur(10px);
+
+border:1px solid
+rgba(255,255,255,0.15);
+
+border-radius:15px;
+
+padding:20px;
+
+text-align:center;
+}
+
+.card h3{
+margin-bottom:15px;
+color:#93c5fd;
+}
+
+.value{
+font-size:30px;
+font-weight:bold;
+}
+
+input,
+select{
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+font-size:18px;
+margin-top:10px;
+}
+
+button{
+margin-top:10px;
+padding:12px;
+width:100%;
+
+border:none;
+border-radius:8px;
+
+font-size:18px;
+font-weight:bold;
+
+cursor:pointer;
+}
+
+.blue{
+background:#2563eb;
+color:white;
+}
+
+.green{
+background:#16a34a;
+color:white;
+}
+
+.red{
+background:#dc2626;
+color:white;
+}
+
+.auto{
+color:#22c55e;
+}
+
+.manual{
+color:#ef4444;
+}
+
+.footer{
+margin-top:30px;
+text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<h1>
+PSG COLLEGE OF TECHNOLOGY
+</h1>
+
+<h2>
+AUTOMATIC MULTI PCD DRILL JIG
+</h2>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+<h3>CUSTOMER</h3>
+<div class="value" id="customer">
+PSGCT
+</div>
+</div>
+
+<div class="card">
+<h3>PART NUMBER</h3>
+<div class="value" id="part">
+CT001
+</div>
+</div>
+
+<div class="card">
+<h3>MODE</h3>
+<div class="value auto" id="mode">
+AUTO
+</div>
+</div>
+
+<div class="card">
+<h3>COMPLETED PIECES</h3>
+<div class="value" id="pieces">
+0
+</div>
+</div>
+
+<div class="card">
+<h3>TARGET PIECES</h3>
+<div class="value" id="targetDisplay">
+0
+</div>
+
+<input
+type="number"
+id="targetInput"
+value="5">
+
+<button
+class="green"
+onclick="setTarget()">
+SET TARGET
+</button>
+</div>
+
+<div class="card">
+<h3>DWELL TIME</h3>
+<div class="value" id="dwell">
+500
+</div>
+</div>
+
+<div class="card">
+<h3>CURRENT ANGLE</h3>
+<div class="value" id="angle">
+0°
+</div>
+
+<select id="angleSelect">
+<option value="0">0°</option>
+<option value="60">60°</option>
+<option value="120">120°</option>
+<option value="180">180°</option>
+<option value="240">240°</option>
+<option value="300">300°</option>
+</select>
+
+<button
+class="blue"
+onclick="setAngle()">
+SET ANGLE
+</button>
+
+</div>
+
+</div>
+
+<div class="footer">
+Automatic Multi PCD Drill Jig Monitoring System
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+
+const firebaseConfig = {
+apiKey: "AIzaSyDIF8xsYd8IVEMReXZ5oJB7DlrEamUtBUs",
+authDomain: "esp8266-8de09.firebaseapp.com",
+databaseURL: "https://esp8266-8de09-default-rtdb.firebaseio.com",
+projectId: "esp8266-8de09",
+storageBucket: "esp8266-8de09.firebasestorage.app",
+messagingSenderId: "161537926852",
+appId: "1:161537926852:web:d6f906ef959adc55744b91"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+function setAngle()
+{
+let angle =
+Number(
+document.getElementById(
+"angleSelect").value);
+
+db.ref("DrillJig").update({
+setAngle:angle
+});
+
+alert(
+"Angle Set : "
++ angle + "°");
+}
+
+function setTarget()
+{
+let target =
+Number(
+document.getElementById(
+"targetInput").value);
+
+db.ref("DrillJig").update({
+targetPieces:target
+});
+
+alert(
+"Target Set : "
++ target);
+}
+
+db.ref("DrillJig")
+.on("value",
+(snapshot)=>{
+
+const d =
+snapshot.val();
+
+if(!d) return;
+
+document.getElementById(
+"customer").innerHTML =
+d.customerName || "PSGCT";
+
+document.getElementById(
+"part").innerHTML =
+d.partNumber || "CT001";
+
+document.getElementById(
+"pieces").innerHTML =
+d.completedPieces || 0;
+
+document.getElementById(
+"targetDisplay").innerHTML =
+d.targetPieces || 0;
+
+document.getElementById(
+"dwell").innerHTML =
+d.dwellTime || 0;
+
+document.getElementById(
+"angle").innerHTML =
+(d.angle || 0) + "°";
+
+let mode =
+d.mode || "AUTO";
+
+let modeObj =
+document.getElementById(
+"mode");
+
+modeObj.innerHTML =
+mode;
+
+if(mode=="AUTO")
+{
+modeObj.className =
+"value auto";
+}
+else
+{
+modeObj.className =
+"value manual";
+}
+
+});
+
+</script>
+
+</body>
+</html>
